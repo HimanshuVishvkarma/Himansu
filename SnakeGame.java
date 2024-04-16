@@ -1,3 +1,163 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Random;
+    public class SnakeGame extends JPanel implements KeyListener, ActionListener {
+
+        private final int WIDTH = 400;
+        private final int HEIGHT = 400;
+        private final int UNIT_SIZE = 20;
+        private final int DELAY = 200;
+    
+        private ArrayList<Point> snake;
+        private Point food;
+        private char direction; 
+        private boolean running;
+        private Timer timer;
+        private int score; // Added score variable
+    
+        public SnakeGame() {
+            setPreferredSize(new Dimension(WIDTH, HEIGHT));
+            setBackground(Color.black);
+            setFocusable(true);
+            addKeyListener(this);
+            initGame();
+        }
+    
+        private void initGame() {
+            snake = new ArrayList<>();
+            snake.add(new Point(WIDTH / 2, HEIGHT / 2));
+            generateFood();
+            direction = 'R';
+            running = true;
+            timer = new Timer(DELAY, this);
+            timer.start();
+        }
+    
+        private void generateFood() {
+            Random rand = new Random();
+            int x = rand.nextInt((WIDTH / UNIT_SIZE)) * UNIT_SIZE;
+            int y = rand.nextInt((HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+            food = new Point(x, y);
+        }
+    
+        private void move() {
+            Point head = snake.get(0);
+            Point newHead = new Point(head);
+            switch (direction) {
+                case 'U':
+                    newHead.y -= UNIT_SIZE;
+                    break;
+                case 'D':
+                    newHead.y += UNIT_SIZE;
+                    break;
+                case 'L':
+                    newHead.x -= UNIT_SIZE;
+                    break;
+                case 'R':
+                    newHead.x += UNIT_SIZE;
+                    break;
+            }
+            snake.add(0, newHead);
+            if (!newHead.equals(food))
+                snake.remove(snake.size() - 1);
+            else
+                generateFood();
+        }
+    
+        private void checkCollision() {
+            Point head = snake.get(0);
+            if (head.x < 0 || head.x >= WIDTH || head.y < 0 || head.y >= HEIGHT) {
+                running = false;
+                return;
+            }
+            for (int i = 1; i < snake.size(); i++) {
+                if (head.equals(snake.get(i))) {
+                    running = false;
+                    return;
+                }
+            }
+        }
+    
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            draw(g);
+        }
+    
+        private void draw(Graphics g) {
+            if (running) {
+                g.setColor(Color.green);
+                g.fillRect(food.x, food.y, UNIT_SIZE, UNIT_SIZE);
+                for (Point point : snake) {
+                    g.setColor(Color.white);
+                    g.fillRect(point.x, point.y, UNIT_SIZE, UNIT_SIZE);
+                }
+            } else {
+                gameOver(g);
+            }
+        }
+    
+        private void gameOver(Graphics g) {
+            g.setColor(Color.red);
+            g.setFont(new Font("Arial", Font.BOLD, 40));
+            g.drawString("Game Over", WIDTH / 2 - 110, HEIGHT / 2);
+             // Display final score
+        g.drawString("Score: " + score, WIDTH / 2 - 70, HEIGHT / 2 + 50);
+        }
+    
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (running) {
+                move();
+                checkCollision();
+                repaint();
+                
+            }
+        }
+    
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_UP:
+                    if (direction != 'D')
+                        direction = 'U';
+                    break;
+                case KeyEvent.VK_DOWN:
+                    if (direction != 'U')
+                        direction = 'D';
+                    break;
+                case KeyEvent.VK_LEFT:
+                    if (direction != 'R')
+                        direction = 'L';
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if (direction != 'L')
+                        direction = 'R';
+                    break;
+            }
+        }
+    
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+    
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+    
+        public static void main(String[] args) {
+            JFrame frame = new JFrame("Snake Game");
+            SnakeGame game = new SnakeGame();
+            frame.add(game);
+            frame.pack();
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        }
+    }
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -16,10 +176,10 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class SnakeGame extends JPanel implements KeyListener, ActionListener {
-   private final int WIDTH = 500;
-   private final int HEIGHT = 500;
-   private final int UNIT_SIZE = 5;
-   private final int DELAY = 50;
+   private final int WIDTH = 400;
+   private final int HEIGHT = 400;
+   private final int UNIT_SIZE = 20;
+   private final int DELAY = 300;
    private ArrayList<Point> snake;
    private Point food;
    private char direction;
@@ -28,7 +188,7 @@ public class SnakeGame extends JPanel implements KeyListener, ActionListener {
    private int score;
 
    public SnakeGame() {
-      this.setPreferredSize(new Dimension(500, 500));
+      this.setPreferredSize(new Dimension(400, 400));
       this.setBackground(Color.black);
       this.setFocusable(true);
       this.addKeyListener(this);
